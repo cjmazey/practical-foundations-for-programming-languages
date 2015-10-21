@@ -147,7 +147,7 @@ end stack
 
 /- Task 3.3 -/
 namespace stack
-  theorem even.induction_on_even :
+  theorem even.induction_even :
       ∀ {S : stack → Prop},
         S [] →
         (∀ c₁ c₂ s, S s → S (c₁ :: c₂ :: s)) →
@@ -158,4 +158,39 @@ namespace stack
         IB
         (λ c s `_` H, H c)
         (λ c₂ s `even s` `S s` c₁, IH c₁ c₂ s `S s`)
+end stack
+
+/- Task 3.4 -/
+namespace stack
+  inductive cut : stack → stack → stack → Prop :=
+  | nil : ∀ s, cut s s []
+  | cons : ∀ c s₁ s₂ s₃, cut s₁ s₂ s₃ → cut (c :: s₁) s₂ (c :: s₃)
+
+  namespace cut
+    premise inversion_nil : ∀ s₁ s₂, cut s₁ s₂ [] → s₁ = s₂
+    premise inversion_cons : ∀ c s₁ s₂ s₃,
+                               cut s₁ s₂ (c :: s₃) →
+                               ∃ s₁', s₁ = (c :: s₁') ∧ cut s₁' s₂ s₃
+
+    example : ∀ s₁ s₂ s₃, even s₂ → even s₃ → cut s₁ s₂ s₃ → even s₁ :=
+    have H : ∀ s₃, even s₃ → ∀ s₁ s₂, even s₂ → cut s₁ s₂ s₃ → even s₁, from
+      even.induction_even
+        (take s₁ s₂,
+         assume He₂ Hc,
+         have s₁ = s₂, from inversion_nil s₁ s₂ Hc,
+         eq.subst (eq.symm this) He₂)
+        (take c₁ c₂ s,
+         assume IH,
+         take s₁ s₂,
+         assume He₂ Hc,
+         obtain s₁' Es₁', from inversion_cons _ _ _ _ Hc,
+         obtain s₁'' Es₁'', from inversion_cons _ _ _ _ (and.right Es₁'),
+         have even s₁'', from IH s₁'' s₂ He₂ (and.right Es₁''),
+         have s₁ = c₁ :: s₁', from and.left Es₁',
+         have s₁' = c₂ :: s₁'', from and.left Es₁'',
+         have s₁ = c₁ :: c₂ :: s₁'', from eq.subst `s₁' = c₂ :: s₁''` `s₁ = c₁ :: s₁'`,
+         have even (c₁ :: c₂ :: s₁''), from even.cons c₁ _ (odd.cons c₂ s₁'' `even s₁''`),
+         eq.subst (eq.symm `s₁ = c₁ :: c₂ :: s₁''`) this),
+    λ s₁ s₂ s₃ He₂ He₃, H s₃ He₃ s₁ s₂ He₂
+  end cut
 end stack
