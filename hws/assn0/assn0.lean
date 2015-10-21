@@ -1,5 +1,5 @@
 /- 15-312 Principles of Programming Languages
- - Assignment 0: Rule Induction
+   Assignment 0: Rule Induction
  -/
 
 import standard
@@ -103,9 +103,46 @@ section
   example : ¬seperate [♡, ♢] [♢, ♡] [] := sorry
 end
 
-/- Task 2.5 -/
+/- Task 2.5
+
+   It means s₁ uniquely determines s₂ and s₃ (and they always exist.)
+   "unshuffle" does not have this mode because in its case they are
+   not unique (e.g. Task 2.2.)
+
+ -/
 section
   open card stack stack.seperate
 
   example : ∀ s₁, ∃! s₂ s₃, seperate s₁ s₂ s₃ := sorry
 end
+
+/- 3 Cutting cards -/
+
+namespace stack
+  inductive even : stack → Prop :=
+  | nil : even []
+  | cons : ∀ c s, odd s → even (c :: s)
+  with odd : stack → Prop :=
+  | cons : ∀ c s, even s → odd (c :: s)
+end stack
+
+/- Task 3.1 -/
+section
+  open stack
+
+  check @even.induction_on
+  check @odd.induction_on
+end
+
+/- Task 3.2
+
+   This seems quite impossible?  The following is not exactly a proof.
+ -/
+namespace stack
+  inductive is_a_stack : stack → Prop :=
+  | of_course_it_is : ∀ s, is_a_stack s
+
+  example : ∀ s, even s → is_a_stack s := sorry
+end stack
+
+/- Task 3.3 -/
