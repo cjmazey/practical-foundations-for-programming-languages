@@ -2,6 +2,8 @@
  - Assignment 0: Rule Induction
  -/
 
+import standard
+
 /- 2 Shuffling cards -/
 
 inductive card : Type :=
@@ -99,4 +101,11 @@ section
   example : ¬seperate [♡, ♠] [♡, ♠] [] := sorry
 
   example : ¬seperate [♡, ♢] [♢, ♡] [] := sorry
+end
+
+/- Task 2.5 -/
+section
+  open card stack stack.seperate
+
+  example : ∀ s₁, ∃! s₂ s₃, seperate s₁ s₂ s₃ := sorry
 end
