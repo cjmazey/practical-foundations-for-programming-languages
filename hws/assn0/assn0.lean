@@ -146,3 +146,16 @@ namespace stack
 end stack
 
 /- Task 3.3 -/
+namespace stack
+  theorem even.induction_on_even :
+      ∀ {S : stack → Prop},
+        S [] →
+        (∀ c₁ c₂ s, S s → S (c₁ :: c₂ :: s)) →
+        ∀ s, even s → S s :=
+  λ S IB IH,
+    λ s `even s`,
+      @even.induction_on (λ s, S s) (λ s, ∀ c, S (c :: s)) s `even s`
+        IB
+        (λ c s `_` H, H c)
+        (λ c₂ s `even s` `S s` c₁, IH c₁ c₂ s `S s`)
+end stack
