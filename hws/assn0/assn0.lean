@@ -54,3 +54,16 @@ section
   example : unshuffle [♡, ♠, ♠, ♢] [♠, ♢] [♡, ♠] :=
   🂡🂠🂡 $ 🂡🂠🂡 $ 🂡🂡🂠 $ 🂡🂡🂠 $ 🂠🂠🂠
 end
+
+/- Task 2.3 -/
+section
+  open card stack stack.unshuffle
+
+  example : ∀ s₁, ∃ s₂ s₃, unshuffle s₁ s₂ s₃ :=
+  take s₁,
+  stack.induction_on s₁
+  (exists.intro [] (exists.intro [] 🂠🂠🂠))
+  (take c s₁' IH,
+   obtain s₂ s₃ IH', from IH,
+   exists.intro s₂ (exists.intro (c :: s₃) (🂡🂠🂡 IH')))
+end
