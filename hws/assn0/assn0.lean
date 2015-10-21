@@ -28,9 +28,9 @@ namespace stack
   inductive unshuffle : stack → stack → stack → Prop :=
   | intro_nil : unshuffle [] [] []
   | intro_right : ∀ {c s₁ s₂ s₃},
-                      unshuffle s₁ s₂ s₃ → unshuffle (c :: s₁) s₂ (c :: s₃)
+                    unshuffle s₁ s₂ s₃ → unshuffle (c :: s₁) s₂ (c :: s₃)
   | intro_left : ∀ {c s₁ s₂ s₃},
-                     unshuffle s₁ s₂ s₃ → unshuffle (c :: s₁) (c :: s₂) s₃
+                   unshuffle s₁ s₂ s₃ → unshuffle (c :: s₁) (c :: s₂) s₃
 
   namespace unshuffle
     notation `🂠🂠🂠` := intro_nil
@@ -66,4 +66,37 @@ section
   (take c s₁' IH,
    obtain s₂ s₃ IH', from IH,
    exists.intro s₂ (exists.intro (c :: s₃) (🂡🂠🂡 IH')))
+end
+
+/- Task 2.4 -/
+namespace stack
+  open card
+
+  inductive seperate : stack → stack → stack → Prop :=
+  | intro_nil : seperate [] [] []
+  | intro_spade : ∀ {s₁ s₂ s₃},
+                    seperate s₁ s₂ s₃ → seperate (♠ :: s₁) s₂ (♠ :: s₃)
+  | intro_club : ∀ {s₁ s₂ s₃},
+                   seperate s₁ s₂ s₃ → seperate (♣ :: s₁) s₂ (♣ :: s₃)
+  | intro_heart : ∀ {s₁ s₂ s₃},
+                    seperate s₁ s₂ s₃ → seperate (♡ :: s₁) (♡ :: s₂) s₃
+  | intro_diamond : ∀ {s₁ s₂ s₃},
+                      seperate s₁ s₂ s₃ → seperate (♢ :: s₁) (♢ :: s₂) s₃
+end stack
+
+section
+  open card stack stack.seperate function
+
+  example : seperate [♡, ♢, ♠] [♡, ♢] [♠] :=
+  intro_heart $ intro_diamond $ intro_spade $ intro_nil
+
+  example : seperate [♠, ♢, ♣, ♡] [♢, ♡] [♠, ♣] :=
+  intro_spade $ intro_diamond $ intro_club $ intro_heart $ intro_nil
+
+  example : seperate [♣, ♡, ♣, ♠] [♡] [♣, ♣, ♠] :=
+  intro_club $ intro_heart $ intro_club $ intro_spade $ intro_nil
+
+  example : ¬seperate [♡, ♠] [♡, ♠] [] := sorry
+
+  example : ¬seperate [♡, ♢] [♢, ♡] [] := sorry
 end
