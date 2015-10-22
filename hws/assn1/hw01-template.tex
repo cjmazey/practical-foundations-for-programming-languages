@@ -1,0 +1,338 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{verbatim}
+\usepackage{code,proof,amsthm,amssymb, amsmath}
+\usepackage{ifthen}
+\usepackage{graphics}
+\usepackage{mathpartir}
+
+%% Question macros
+\newcounter{question}[section]
+\newcounter{extracredit}[section]
+\newcounter{totalPoints}
+\setcounter{totalPoints}{0}
+\newcommand{\question}[1]
+{
+\bigskip
+\addtocounter{question}{1}
+\addtocounter{totalPoints}{#1}
+\noindent
+{\textbf{Task \thesection.\thequestion}}[#1 points]:
+
+
+}
+\newcommand{\ecquestion}
+{
+\bigskip
+\addtocounter{extracredit}{1}
+\noindent
+\textbf{Extra Credit \thesection.\theextracredit}:}
+  
+%% Set to "false" to generate the problem set, set to "true" to generate the solution set
+\def\issolution{false}
+
+\newcounter{taskcounter}
+\newcounter{taskPercentCounter}
+\newcounter{taskcounterSection}
+\setcounter{taskcounter}{1}
+\setcounter{taskPercentCounter}{0}
+\setcounter{taskcounterSection}{\value{section}}
+\newcommand{\mayresettaskcounter}{\ifthenelse{\value{taskcounterSection} < \value{section}}
+{\setcounter{taskcounterSection}{\value{section}}\setcounter{taskcounter}{1}}
+{}}
+
+% Solution-only - uses an "input" so that it's still safe to publish the problem set file 
+\definecolor{solutioncolor}{rgb}{0.0, 0.0, 0.5}
+\newcommand{\solution}[1]
+  {\ifthenelse{\equal{\issolution}{true}}
+  {\begin{quote}
+%    \addtocounter{taskcounter}{-1}
+    \fbox{\textcolor{solutioncolor}{\bf Solution \arabic{section}.\arabic{taskcounter}}}
+    \addtocounter{taskcounter}{1}
+    \textcolor{solutioncolor}{\input{./solutions/#1}}
+  \end{quote}}
+  {}}
+
+\newcommand{\qbox}{\fbox{???}}
+
+\setcounter{taskcounter}{1}
+\setcounter{taskPercentCounter}{0}
+\setcounter{taskcounterSection}{\value{section}}
+
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+%% part of a problem
+\newcommand{\task}[1]
+  {\bigskip \noindent {\bf Task\mayresettaskcounter{}\addtocounter{taskPercentCounter}{#1} \arabic{taskcounter}\addtocounter{taskcounter}{1}} (#1\%).}
+
+\newcommand{\ectask} 
+  {\bigskip \noindent {\bf Task\mayresettaskcounter{} \arabic{section}.\arabic{taskcounter}\addtocounter{taskcounter}{1}} (Extra Credit).}
+  
+\newcommand{\val}[1]{#1~\textsf{val}}
+\newcommand{\num}[1]{\texttt{num}[#1]}
+\newcommand{\str}[1]{\texttt{str}[#1]}
+\newcommand{\plus}[2]{\texttt{plus}(#1; #2)}
+\newcommand{\mult}[2]{\texttt{times}(#1; #2)}
+\newcommand{\cat}[2]{\texttt{cat}(#1; #2)}
+\newcommand{\len}[1]{\texttt{len}(#1)}
+\newcommand{\abst}[2]{#1.#2}
+\newcommand{\letbind}[3]{\texttt{let}(#1; \abst{#2}{#3})}
+\newcommand{\steps}[2]{#1 \mapsto #2}
+\newcommand{\subst}[3]{[#1/#2]#3}
+\newcommand{\err}[1]{#1~\textsf{err}}
+
+\newcommand{\proves}{\vdash}
+\newcommand{\hasType}[2]{#1 : #2}
+\newcommand{\typeJ}[3]{#1 \proves \hasType{#2}{#3}}
+\newcommand{\ctx}{\Gamma}
+\newcommand{\emptyCtx}{\emptyset}
+\newcommand{\xCtx}[2]{\ctx, \hasType{#1}{#2}}
+\newcommand{\typeJC}[2]{\typeJ{\ctx}{#1}{#2}}
+\newcommand{\numt}{\texttt{num}}
+\newcommand{\strt}{\texttt{str}}
+
+
+\title{Assignment \#1: \\
+        Abstract Binding Trees, Dynamics and Statics}
+
+\author{15-312: Principles of Programming Languages}
+\date{Out: Tuesday, January 23rd, 2013\\
+      Due: Monday, February 4th, 2013 11:59pm}
+
+\begin{document}
+\maketitle
+\subsection*{Abstract Binding Trees}
+
+\task{5} Suppose \texttt{v} has type \texttt{t view}. Will \texttt{out(into(v))} be equal to \texttt{v}? Explain why or why not.
+
+Think carefully about what effect the renaming \texttt{out} can
+perform before answering this question.
+
+\subsection*{Statics}
+\addtocounter{taskcounter}{4}
+\task{10} (Unicity of Typing) Prove that for every typing context $\ctx$ and expression $e$, there exists at most one $\tau$ such that $\typeJC{e}{\tau}$.
+
+\task{10} (Canonical Forms) Prove that if $\val{e}$, then 
+\begin{enumerate}
+\item if $\typeJC{e}{\numt}$ then $e = \num{n}$ for some number $n$.
+\item if $\typeJC{e}{\strt}$ then $e = \str{s}$ for some string $s$.
+\end{enumerate}
+
+%\newpage
+%\appendix
+%\section{Dynamics of \Lnumstr}
+%\noindent
+%$\fbox{\inferrule{}{\val{e}}}$
+%\begin{mathpar}
+%\inferrule{ }
+%          {\val{\num{n}}}
+%          
+%\inferrule{ }
+%		  {\val{\str{s}}}
+%\end{mathpar}
+%$\fbox{\inferrule{}{\steps{e}{e'}}}$
+%\begin{mathpar}
+%\inferrule{ }{
+%	\steps{\plus{\num{n_1}}{\num{n_2}}}{\num{n_1 + n_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_1}{e_1'}
+%}{
+%	\steps{\plus{e_1}{e_2}}
+%		  {\plus{e_1'}{e_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_2}{e_2'}
+%}{
+%	\steps{\plus{\num{n_1}}{e_2}}
+%		  {\plus{\num{n_1}}{e_2'}}
+%}
+%
+%\inferrule{ }{
+%	\steps{\mult{\num{n_1}}{\num{n_2}}}{\num{n_1 * n_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_1}{e_1'}
+%}{
+%	\steps{\mult{e_1}{e_2}}
+%		  {\mult{e_1'}{e_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_2}{e_2'}
+%}{
+%	\steps{\mult{\num{n_1}}{e_2}}
+%		  {\mult{\num{n_1}}{e_2'}}
+%}
+%
+%\inferrule{ }{
+%	\steps{\cat{\str{s_1}}{\str{s_2}}}{\str{s_1 \text{\textasciicircum} s_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_1}{e_1'}
+%}{
+%	\steps{\cat{e_1}{e_2}}
+%		  {\cat{e_1'}{e_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_2}{e_2'}
+%}{
+%	\steps{\cat{\str{s_1}}{e_2}}
+%		  {\cat{\str{s_1}}{e_2'}}
+%}
+%
+%\inferrule{ }{
+%	\steps{\len{\str{s}}}{\num{|s|}}
+%}
+%
+%\inferrule{
+%	\steps{e}{e'}
+%}{
+%	\steps{\len{e}}{\len{e'}}
+%}
+%
+%\inferrule{\val{e_1}}{
+%	\steps{\letbind{e_1}{x}{e_2}}{\subst{e_1}{x}{e_2}}
+%}
+%
+%\inferrule{
+%	\steps{e_1}{e_1'}
+%}{
+%	\steps{\letbind{e_1}{x}{e_2}}
+%		  {\letbind{e_1'}{x}{e_2}}
+%}
+%\end{mathpar}
+%$\fbox{\inferrule{}{\err{e}}}$
+%\begin{mathpar}
+%\inferrule{ }{
+%	\err{\plus{\str{s}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\plus{\num{n}}{\str{s}}}
+%}
+%
+%\inferrule{
+%	\err{e_1}
+%}{
+%	\err{\plus{e_1}{e_2}}
+%}
+%
+%\inferrule{
+%	\err{e_2}
+%}{
+%	\err{\plus{\num{n}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\mult{\str{s}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\mult{\num{n}}{\str{s}}}
+%}
+%
+%\inferrule{
+%	\err{e_1}
+%}{
+%	\err{\mult{e_1}{e_2}}
+%}
+%
+%\inferrule{
+%	\err{e_2}
+%}{
+%	\err{\mult{\num{n}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\cat{\num{n}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\cat{\str{s}}{\num{n}}}
+%}
+%
+%\inferrule{
+%	\err{e_1}
+%}{
+%	\err{\cat{e_1}{e_2}}
+%}
+%
+%\inferrule{
+%	\err{e_2}
+%}{
+%	\err{\cat{\str{s}}{e_2}}
+%}
+%
+%\inferrule{ }{
+%	\err{\len{\num{n}}}
+%}
+%
+%\inferrule{\err{e}}{
+%	\err{\len{e}}
+%}
+%
+%\inferrule{\err{e_1}}{
+%	\err{\letbind{e_1}{x}{e_2}}
+%}
+%\end{mathpar}
+%
+%\section{Statics of \Lnumstr}
+%$\fbox{\inferrule{}{\typeJC{e}{\tau}}}$
+%\begin{mathpar}
+%\inferrule{\hasType{x}{\tau} \in \ctx}{
+%	\typeJC{x}{\tau}
+%}
+%
+%\inferrule{ }{
+%	\typeJC{\num{n}}{\numt}
+%}
+%
+%\inferrule{ }{
+%	\typeJC{\str{s}}{\strt}
+%}
+%
+%\inferrule{
+%	\typeJC{e_1}{\numt}\\
+%	\typeJC{e_2}{\numt}
+%}{
+%	\typeJC{\plus{e_1}{e_2}}{\numt}
+%}
+%
+%\inferrule{
+%	\typeJC{e_1}{\numt}\\
+%	\typeJC{e_2}{\numt}
+%}{
+%	\typeJC{\mult{e_1}{e_2}}{\numt}
+%}
+%
+%\inferrule{
+%	\typeJC{e_1}{\strt}\\
+%	\typeJC{e_2}{\strt}
+%}{
+%	\typeJC{\cat{e_1}{e_2}}{\strt}
+%}
+%
+%\inferrule{
+%	\typeJC{e}{\strt}
+%}{
+%	\typeJC{\len{e}}{\numt}
+%}
+%
+%\inferrule{
+%	\typeJC{e_1}{\tau_1}\\
+%	\typeJ{\xCtx{x}{\tau_1}}{e_2}{\tau_2}
+%}{
+%	\typeJC{\letbind{e_1}{x}{e_2}}{\tau_2}
+%}
+%\end{mathpar}
+%
+
+\end{document}
+
